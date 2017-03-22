@@ -49,9 +49,9 @@ define(function (require, exports, module) {
         this.byteLimit = byteLimit/4;
     }
 
-    // XXXBramble: given a list of dropped files, write them into the fs, unzipping zip files.
-    LegacyFileImport.prototype.import = function(dataTransfer, callback) {
-        var files = dataTransfer.files;
+    // We want event.dataTransfer.files for legacy browsers.
+    LegacyFileImport.prototype.import = function(source, callback) {
+        var files = source instanceof DataTransfer ? source.files : source;
         var byteLimit = this.byteLimit;
         var pathList = [];
         var errorList = [];

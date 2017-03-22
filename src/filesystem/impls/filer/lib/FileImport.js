@@ -38,8 +38,15 @@ define(function (require, exports, module) {
     // error message we generate in rejectImport() below!
     var byteLimit = 3145728;
 
-    exports.import = function(dataTransfer, callback) {
+
+    // Support passing a DataTransfer object, or a FileList
+    exports.import = function(source, callback) {
+        if(!(source instanceof FileList || source instanceof DataTransfer)) {
+            callback(new Error("[Bramble] expected DataTransfer or FileList to FileImport.import()"));
+            return;
+        }
+
         var strategy = _create(byteLimit);
-        return strategy.import(dataTransfer, callback);
+        return strategy.import(source, callback);
     };
 });

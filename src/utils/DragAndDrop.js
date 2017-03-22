@@ -271,7 +271,15 @@ define(function (require, exports, module) {
             event.preventDefault();
             options.ondrop(event);
 
-            FileImport.import(event.dataTransfer, function(err, paths) {
+            processFiles(event.dataTransfer, function(err) {
+                if(err) {
+                    console.log("[Bramble] error handling dropped files", err);
+                }
+            });
+        }
+
+        function processFiles(source, callback) {
+            FileImport.import(source, function(err, paths) {
                 if(err) {
                     _showErrorDialog(err);
                 }
@@ -298,6 +306,8 @@ define(function (require, exports, module) {
                     }
 
                     openDroppedFiles(paths);
+
+                    callback(err);
                 });
             });
         }
