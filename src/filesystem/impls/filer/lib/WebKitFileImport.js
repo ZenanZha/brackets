@@ -50,7 +50,7 @@ define(function (require, exports, module) {
     }
 
     // We want event.dataTransfer.items for WebKit style browsers
-    WebKitFileImport.prototype.import = function(source, callback) {
+    WebKitFileImport.prototype.import = function(source, parentPath, callback) {
         var items = source instanceof DataTransfer ? source.items : source;
         var byteLimit = this.byteLimit;
         var pathList = [];
@@ -268,9 +268,9 @@ define(function (require, exports, module) {
             var err;
 
             if(entry.isDirectory) {
-                maybeImportDirectory(StartupState.project("root"), entry, deferred);
+                maybeImportDirectory(parentPath, entry, deferred);
             } else if (entry.isFile) {
-                maybeImportFile(StartupState.project("root"), entry, deferred);
+                maybeImportFile(parentPath, entry, deferred);
             } else {
                 // Skip it, we don't know what this is
                 err = new Error(Strings.DND_UNSUPPORTED_FILE_TYPE);

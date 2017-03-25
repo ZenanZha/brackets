@@ -5,9 +5,10 @@
 define(function (require, exports, module) {
     "use strict";
 
-    var LegacyFileImport = require("filesystem/impls/filer/lib/LegacyFileImport"),
-        WebKitFileImport = require("filesystem/impls/filer/lib/WebKitFileImport"),
-        FileSystemCache = require("filesystem/impls/filer/FileSystemCache");
+    var LegacyFileImport     = require("filesystem/impls/filer/lib/LegacyFileImport"),
+        WebKitFileImport     = require("filesystem/impls/filer/lib/WebKitFileImport"),
+        FileSystemCache      = require("filesystem/impls/filer/FileSystemCache"),
+        BrambleStartupState  = brackets.getModule("bramble/StartupState");
 
     /**
      * XXXBramble: the Drag and Drop and File APIs are a mess of incompatible
@@ -39,16 +40,18 @@ define(function (require, exports, module) {
     // error message we generate in rejectImport() below!
     var byteLimit = 3145728;
 
-
     // Support passing a DataTransfer object, or a FileList
-    exports.import = function(source, callback) {
+    exports.import = function(source, parentPath, callback) {
         if(!(source instanceof FileList || source instanceof DataTransfer)) {
             callback(new Error("[Bramble] expected DataTransfer or FileList to FileImport.import()"));
             return;
         }
 
+        // If we are given a sub-dir within the project, use that.  Otherwise use project root.
+        parentPath = parentPath || BrambleStartupState.project("root");
+
         var strategy = _create(byteLimit);
-        return strategy.import(source, function(err) {
+        return strategy.import(source, parentPath, function(err) {
             FileSystemCache.refresh(callback);
         });
     };

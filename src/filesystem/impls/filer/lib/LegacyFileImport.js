@@ -50,7 +50,7 @@ define(function (require, exports, module) {
     }
 
     // We want event.dataTransfer.files for legacy browsers.
-    LegacyFileImport.prototype.import = function(source, callback) {
+    LegacyFileImport.prototype.import = function(source, parentPath, callback) {
         var files = source instanceof DataTransfer ? source.files : source;
         var byteLimit = this.byteLimit;
         var pathList = [];
@@ -194,7 +194,7 @@ define(function (require, exports, module) {
             reader.onload = function(e) {
                 delete reader.onload;
 
-                var filename = Path.join(StartupState.project("root"), item.name);
+                var filename = Path.join(parentPath, item.name);
                 var file = FileSystem.getFileForPath(filename);
                 var ext = Path.extname(filename).toLowerCase();
 

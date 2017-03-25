@@ -50,6 +50,10 @@ define(function (require, exports, module) {
         ArchiveUtils    = require("filesystem/impls/filer/ArchiveUtils"),
         FileImport      = require("filesystem/impls/filer/lib/FileImport");
 
+    // If the user indicates they want to import files deep into the filetree
+    // this is the path they want to use as a parent dir root.
+    var _dropPathHint;
+
     /**
      * Returns true if the drag and drop items contains valid drop objects.
      * @param {Array.<DataTransferItem>} items Array of items being dragged
@@ -58,7 +62,6 @@ define(function (require, exports, module) {
     function isValidDrop(types) {
         var i = 0;
         var type;
-        console.log("Types", types);
 
         if (types) {
             for (var i = 0; i < types.length; i++) {
@@ -326,7 +329,7 @@ define(function (require, exports, module) {
      * and process them, such that they end
      */
     function processFiles(source, callback) {
-        FileImport.import(source, function(err, paths) {
+        FileImport.import(source, _dropPathHint, function(err, paths) {
             if(err) {
                 _showErrorDialog(err);
             }
@@ -335,8 +338,18 @@ define(function (require, exports, module) {
             paths = paths || [];
             openDroppedFiles(paths);
 
+            // Reset drop path, until we get an explicit one set in future.
+            _dropPathHint = null;
+
             callback(err);
         });
+    }
+
+    /**
+     * Sets a path to a root dir to use for importing dropped paths (see FileTreeView.js)
+     */
+    function setDropPathHint(path) {
+        _dropPathHint = path;
     }
 
     CommandManager.register(Strings.CMD_OPEN_DROPPED_FILES, Commands.FILE_OPEN_DROPPED_FILES, openDroppedFiles);
@@ -345,4 +358,5 @@ define(function (require, exports, module) {
     exports.attachHandlers      = attachHandlers;
     exports.isValidDrop         = isValidDrop;
     exports.openDroppedFiles    = openDroppedFiles;
+    exports.setDropPathHint     = setDropPathHint;
 });
