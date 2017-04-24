@@ -188,8 +188,11 @@ define(function (require, exports, module) {
             // it's text, reject it.
             var ext = Path.extname(filename).replace(/^\./, "").toLowerCase();
             var languageIsSupported = !!LanguageManager.getLanguageForExtension(ext);
-
-            if (languageIsSupported) {
+			//However, copying ".txt" file is also rejected by thimble, becuase
+			//the type - "text/plain" does not belong to any programming language.
+			
+			//We enable copying ".txt" files into thimble, so we open a backdoor here.
+            if (languageIsSupported || (/^txt$/).test(ext)) {
                 return null;
             }
             return new Error(Strings.DND_UNSUPPORTED_FILE_TYPE);
